@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>XTeam - WORLD CUP 26</title>
+    <style>
+        /* === ВИЗУАЛЬНЫЙ СТИЛЬ ЧМ-2026 === */
+        :root {
+            --bg-color: #0f1015;
+            --neon-green: #00ff41;
+            --deep-purple: #4b0082;
+            --neon-blue: #00d2ff;
+            --canada-red: #ff003f;
+            --text-main: #f0f0f0;
+            --panel-bg: rgba(25, 26, 35, 0.85);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 0%, #2a0845 0%, var(--bg-color) 60%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 600px;
+            min-height: 100vh;
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulseNeon {
+            0% { box-shadow: 0 0 5px var(--neon-green); }
+            50% { box-shadow: 0 0 20px var(--neon-green), 0 0 30px var(--neon-green); }
+            100% { box-shadow: 0 0 5px var(--neon-green); }
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(-100vh) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            animation: fadeIn 0.4s ease-out;
+            flex-grow: 1;
+        }
+        .screen.active {
+            display: flex;
+        }
+
+        /* Логотип */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .logo-26 {
+            font-size: 100px;
+            font-weight: 900;
+            line-height: 1;
+            background: linear-gradient(180deg, var(--neon-blue), var(--deep-purple), var(--canada-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            z-index: 1;
+        }
+        .logo-trophy {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            z-index: 2;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: var(--text-main);
+            margin-top: 10px;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* Кнопки */
+        .btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--neon-blue);
+            color: var(--text-main);
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 12px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        .btn:hover, .btn:active {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+        .btn-green {
+            border-color: var(--neon-green);
+        }
+        .btn-green:hover, .btn-green:active {
+            background: var(--neon-green);
+            box-shadow: 0 0 15px var(--neon-green);
+        }
+        .btn-red {
+            border-color: var(--canada-red);
+        }
+        .btn-red:hover, .btn-red:active {
+            background: var(--canada-red);
+            box-shadow: 0 0 15px var(--canada-red);
+        }
+
+        /* Панели и карточки */
+        .panel {
+            background: var(--panel-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: var(--neon-green);
+            text-transform: uppercase;
+            font-size: 22px;
+            letter-spacing: 1px;
+        }
+
+        /* Состав команды */
+        .player-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .player-row:last-child { border: none; }
+        .player-pos {
+            font-weight: bold;
+            color: var(--neon-blue);
+            width: 40px;
+        }
+
+        /* Таблица группы */
+        .group-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .group-table th, .group-table td {
+            padding: 8px 5px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .group-table th { color: var(--neon-blue); font-weight: normal; }
+        .group-table td.team-name { text-align: left; font-weight: bold; }
+        .group-table tr.xteam-row { background: rgba(0, 255, 65, 0.1); color: var(--neon-green); }
+
+        /* Выбор тактики */
+        .tactics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .tactic-card {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+        .tactic-card.selected {
+            border-color: var(--neon-green);
+            background: rgba(0, 255, 65, 0.15);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+        .tactic-title { font-weight: bold; margin-bottom: 5px; }
+
+        /* Симуляция матча */
+        .scoreboard {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, rgba(75,0,130,0.8), rgba(0,0,0,0.8), rgba(255,0,63,0.5));
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid var(--neon-blue);
+        }
+        .score-team { font-size: 20px; font-weight: bold; flex: 1; text-align: center;}
+        .score-team.xteam { color: var(--neon-green); }
+        .score-center { font-size: 32px; font-weight: 900; padding: 0 20px; }
+        .match-time {
+            text-align: center;
+            font-size: 24px;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .logs-container {
+            flex-grow: 1;
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            padding: 15px;
+            overflow-y: auto;
+            max-height: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .log-entry {
+            background: rgba(255,255,255,0.05);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #666;
+            font-size: 15px;
+            line-height: 1.4;
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .log-entry.event-goal { border-left-color: var(--neon-green); background: rgba(0, 255, 65, 0.1); }
+        .log-entry.event-opp-goal { border-left-color: var(--canada-red); background: rgba(255, 0, 63, 0.1); }
+        .log-entry.event-save { border-left-color: var(--neon-blue); }
+        .log-entry.event-def { border-left-color: var(--deep-purple); }
+
+        /* Конфетти для победы */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--neon-green);
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .title-gold {
+            color: gold;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            font-size: 32px;
+            text-align: center;
+            margin: 20px 0;
+            animation: pulseNeon 2s infinite;
+        }
+    </style>
+</head>
+<body>
+<!-- Фоновая музыка -->
+<audio id="bg-music" loop>
+    <source src="bg-music.mp3" type="audio/mpeg">
+</audio>
+
+<div id="app">
+    <!-- ГЛАВНОЕ МЕНЮ -->
+    <div id="screen-menu" class="screen active">
+        <div class="logo-container">
+            <div class="logo-26">26</div>
+            <div class="logo-trophy">🏆</div>
+            <div class="logo-text">WORLD CUP</div>
+        </div>
+        <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+            <button class="btn btn-green" onclick="goToScreen('draw'); initTournament();">Начать турнир</button>
+            <button class="btn" onclick="goToScreen('roster')">Состав XTeam</button>
+        </div>
+    </div>
+
+    <!-- СОСТАВ -->
+    <div id="screen-roster" class="screen">
+        <h2 style="margin-top: 10px;">Состав XTeam</h2>
+        <div class="panel" id="roster-list">
+            <!-- Заполняется из JS -->
+        </div>
+        <button class="btn" onclick="goToScreen('menu')">Назад в меню</button>
+    </div>
+
+    <!-- ЭКРАН ЖЕРЕБЬЕВКИ -->
+    <div id="screen-draw" class="screen">
+        <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
+            <h2>Жеребьевка</h2>
+            <div class="panel" style="text-align: center;">
+                <p style="font-size: 18px; margin-bottom: 20px;">XTeam попадает в <b>Группу <span id="draw-group-name" style="color:var(--neon-green)"></span></b>!</p>
+                <p style="color: var(--neon-blue); margin-bottom: 10px;">Соперники:</p>
+                <div id="draw-opponents" style="font-size: 20px; font-weight: bold; line-height: 1.8;"></div>
+            </div>
+        </div>
+        <button class="btn btn-green" onclick="setupNextMatch()">К первому матчу</button>
+    </div>
+
+    <!-- ПРЕДМАТЧЕВЫЙ ЭКРАН -->
+    <div id="screen-prematch" class="screen">
+        <h2 id="prematch-stage-title">Групповой этап. Тур 1</h2>
+        
+        <div class="panel">
+            <h3 style="text-align: center; margin-bottom: 15px;">Вывеска матча</h3>
+            <div style="display: flex; justify-content: center; align-items: center; font-size: 22px; font-weight: bold;">
+                <span style="color: var(--neon-green);">XTeam</span>
+                <span style="margin: 0 15px; font-size: 16px; color: #888;">VS</span>
+                <span id="prematch-opponent"></span>
+            </div>
+        </div>
+
+        <div class="panel" id="prematch-standings-panel">
+            <h3 style="text-align: center; margin-bottom: 10px; font-size: 16px; color: #aaa;">Таблица группы</h3>
+            <table class="group-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:left; width: 40%;">Сборная</th>
+                        <th>И</th>
+                        <th>З/П</th>
+                        <th>РМ</th>
+                        <th>О</th>
+                    </tr>
+                </thead>
+                <tbody id="prematch-table-body">
+                    <!-- Заполняется JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel">
+            <h3 style="text-align: center; font-size: 16px; color: #aaa;">Установка на игру</h3>
+            <div class="tactics-grid">
+                <div class="tactic-card selected" onclick="selectTactic('balance')" id="tac-balance">
+                    <div class="tactic-title">Баланс</div>
+                    <div style="color: #bbb;">Стандартная игра</div>
+                </div>
+                <div class="tactic-card" onclick="selectTactic('attack')" id="tac-attack">
+                    <div class="tactic-title" style="color: var(--neon-green)">Атака</div>
+                    <div style="color: #bbb;">Больше голов, риск пропустить</div>
+                </div>
+                <div class="tactic-card" onclick="selectTactic('defense')" id="tac-defense">
+                    <div class="tactic-title" style="color: var(--neon-blue)">Оборона</div>
+                    <div style="color: #bbb;">Надежно сзади, мало моментов</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-green" onclick="startMatch()">Начать симуляцию</button>
+    </div>
+
+    <!-- СИМУЛЯЦИЯ МАТЧА -->
+    <div id="screen-match" class="screen">
+        <h2 id="match-stage-title" style="font-size: 16px; margin-bottom: 10px; color: #888;"></h2>
+        <div class="scoreboard">
+            <div class="score-team xteam">XTeam</div>
+            <div class="score-center" id="match-score">0 : 0</div>
+            <div class="score-team" id="match-opponent-name">Оппонент</div>
+        </div>
+        <div class="match-time"><span id="match-clock">0</span>'</div>
+        
+        <div class="logs-container" id="match-logs">
+            <!-- Логи появляются здесь -->
+            <div class="log-entry" style="text-align: center; border: none; color: #888;">Свисток арбитра! Матч начался.</div>
+        </div>
+
+        <button class="btn" id="btn-match-next" style="display: none; margin-top: 15px;" onclick="finishMatch()">Дальше</button>
+    </div>
+
+    <!-- ИТОГИ МАТЧА -->
+    <div id="screen-postmatch" class="screen">
+        <h2 id="postmatch-title">Матч завершен</h2>
+        <div class="panel" style="text-align: center;">
+            <div style="font-size: 36px; font-weight: 900; margin-bottom: 20px; letter-spacing: 2px;" id="postmatch-score">0 : 0</div>
+            <div id="postmatch-pens" style="color: var(--neon-blue); font-size: 18px; margin-bottom: 20px; display: none;"></div>
+            
+            <div style="text-align: left; margin-bottom: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+                <h4 style="color: var(--neon-green); margin-bottom: 5px;">Голы XTeam:</h4>
+                <ul id="postmatch-xteam-scorers" style="list-style: none; color: #ddd; font-size: 14px;"></ul>
+            </div>
+        </div>
+        <button class="btn btn-green" onclick="processTournamentLogic()">Продолжить</button>
+    </div>
+
+    <!-- ВЫЛЕТ -->
+    <div id="screen-gameover" class="screen" style="justify-content: center; text-align: center;">
+        <div style="font-size: 60px; margin-bottom: 20px;">💔</div>
+        <h2 style="color: var(--canada-red); font-size: 28px;">ТУРНИР ОКОНЧЕН</h2>
+        <p style="font-size: 18px; margin-bottom: 30px; color: #ccc;" id="gameover-text">Вы вылетели из турнира.</p>
+        <button class="btn" onclick="location.reload()">Попробовать снова</button>
+    </div>
+
+    <!-- ПОБЕДА -->
+    <div id="screen-win" class="screen" style="justify-content: center; text-align: center; position: relative; overflow: hidden;">
+        <div class="logo-trophy" style="position: relative; top: auto; left: auto; transform: none; font-size: 120px; margin-bottom: 20px;">🏆</div>
+        <div class="title-gold">XTeam<br>ЧЕМПИОНЫ МИРА 2026!</div>
+        <p style="font-size: 18px; margin-bottom: 40px; color: #eee; z-index: 10;">Вы совершили невероятное и вписали свои имена в историю!</p>
+        <button class="btn btn-green" style="z-index: 10;" onclick="location.reload()">В главное меню</button>
+    </div>
+
+</div>
+
+<script>
+    // === ДАННЫЕ ===
+    const xteamRoster = [
+        { name: "Денис Гришин", pos: "ВРТ", group: "gk" },
+        { name: "Артем Гришин", pos: "ЦЗ", group: "def" },
+        { name: "Андрей Гришин", pos: "ЦЗ", group: "def" },
+        { name: "Кирилл Гришин", pos: "ЛЗ", group: "def" },
+        { name: "Женя Гейда", pos: "ПЗ", group: "def" },
+        { name: "Влад Байкин", pos: "ЦП", group: "mid" },
+        { name: "Яромир Дрюкарев", pos: "ЦП", group: "mid" },
+        { name: "Андрей Гриша", pos: "ЛВ", group: "att" },
+        { name: "Артем Гриша", pos: "ПВ", group: "att" },
+        { name: "Идрис Мастонов", pos: "ЦАП", group: "mid" },
+        { name: "Шахин Мастонов", pos: "НАП", group: "att" }
+    ];
+
+    const allNations = [
+        "Аргентина", "Франция", "Бразилия", "Англия", "Испания", "Германия", "Португалия", "Нидерланды", 
+        "Италия", "Бельгия", "Хорватия", "Уругвай", "США", "Мексика", "Канада", "Япония", 
+        "Сенегал", "Марокко", "Колумбия", "Швейцария", "Дания", "Сербия", "Польша", "Швеция",
+        "Южная Корея", "Камерун", "Гана", "Нигерия", "Австралия", "Иран", "Саудовская Аравия", "Катар",
+        "Чили", "Перу", "Эквадор", "Уэльс", "Шотландия", "Турция", "Австрия", "Венгрия",
+        "Кот-д'Ивуар", "Алжир", "Египет", "Коста-Рика", "Ямайка", "Норвегия", "Чехия"
+    ]; // 47 команд + XTeam = 48
+
+    // === СОСТОЯНИЕ ===
+    let state = {
+        groups: {}, // A-L
+        xteamGroup: '',
+        currentStage: 'group', // group, 1/16, 1/8, 1/4, 1/2, final
+        groupRound: 0, // 0, 1, 2
+        playoffTeams: [],
+        playoffBracket: [], // пары текущего раунда
+        currentOpponent: '',
+        tactic: 'balance',
+        matchState: null
+    };
+
+    const STAGE_NAMES = {
+        'group': 'Групповой этап',
+        '1/16': '1/16 финала',
+        '1/8': '1/8 финала',
+        '1/4': 'Четвертьфинал',
+        '1/2': 'Полуфинал',
+        'final': 'ФИНАЛ'
+    };
+
+    // === УТИЛИТЫ ===
+    function goToScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(`screen-${id}`).classList.add('active');
+    }
+
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function getPlayersByGroup(groupName) {
+        return xteamRoster.filter(p => p.group === groupName).map(p => p.name);
+    }
+
+    // === ИНИЦИАЛИЗАЦИЯ ТУРНИРА ===
+        function initTournament() {
+             // 3. ВСТАВЛЯЕМ СЮДА (Запуск музыки)
+            const music = document.getElementById('bg-music');
+            if (music) {
+                 music.volume = 0.3; // Громкость 30%
+                 music.play().catch(e => console.log("Ждем клика пользователя"));
+            }
+
+
+        const teams = shuffle([...allNations]);
+        teams.splice(0, 0, "XTeam"); // Вставляем XTeam на 0 позицию
+        shuffle(teams); // Перемешиваем еще раз все 48 команд
+
+        const groupLetters = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+        state.groups = {};
+        
+        let teamIndex = 0;
+        for (let letter of groupLetters) {
+            state.groups[letter] = [];
+            for (let i = 0; i < 4; i++) {
+                const teamName = teams[teamIndex++];
+                state.groups[letter].push({
+                    name: teamName,
+                    points: 0,
+                    goalsFor: 0,
+                    goalsAgainst: 0,
+                    played: 0
+                });
+                if (teamName === "XTeam") state.xteamGroup = letter;
+            }
+        }
+
+        state.currentStage = 'group';
+        state.groupRound = 0;
+
+        // Показать жеребьевку
+        document.getElementById('draw-group-name').innerText = state.xteamGroup;
+        const opps = state.groups[state.xteamGroup].filter(t => t.name !== "XTeam").map(t => t.name);
+        document.getElementById('draw-opponents').innerHTML = opps.join('<br>');
+    }
+
+    // === ПОДГОТОВКА К МАТЧУ ===
+    function setupNextMatch() {
+        if (state.currentStage === 'group') {
+            const myGroup = state.groups[state.xteamGroup];
+            const me = myGroup.find(t => t.name === "XTeam");
+            const opponents = myGroup.filter(t => t.name !== "XTeam");
+            
+            // Расписание: 1 тур - 0, 2 тур - 1, 3 тур - 2
+            state.currentOpponent = opponents[state.groupRound].name;
+            
+            document.getElementById('prematch-stage-title').innerText = `Групповой этап. Тур ${state.groupRound + 1}`;
+            renderGroupTable();
+            document.getElementById('prematch-standings-panel').style.display = 'block';
+        } else {
+            // Плей-офф
+            const myMatch = state.playoffBracket.find(m => m.includes("XTeam"));
+            state.currentOpponent = myMatch[0] === "XTeam" ? myMatch[1] : myMatch[0];
+            
+            document.getElementById('prematch-stage-title').innerText = STAGE_NAMES[state.currentStage];
+            document.getElementById('prematch-standings-panel').style.display = 'none';
+        }
+
+        document.getElementById('prematch-opponent').innerText = state.currentOpponent;
+        selectTactic('balance'); // Сброс тактики
+        goToScreen('prematch');
+    }
+
+    function renderGroupTable() {
+        const tbody = document.getElementById('prematch-table-body');
+        const group = [...state.groups[state.xteamGroup]];
+        
+        // Сортировка: Очки, Разница мячей, Забитые
+        group.sort((a, b) => {
+            if (b.points !== a.points) return b.points - a.points;
+            const diffA = a.goalsFor - a.goalsAgainst;
+            const diffB = b.goalsFor - b.goalsAgainst;
+            if (diffB !== diffA) return diffB - diffA;
+            return b.goalsFor - a.goalsFor;
+        });
+
+        tbody.innerHTML = group.map(t => `
+            <tr class="${t.name === 'XTeam' ? 'xteam-row' : ''}">
+                <td class="team-name">${t.name}</td>
+                <td>${t.played}</td>
+                <td>${t.goalsFor}/${t.goalsAgainst}</td>
+                <td>${t.goalsFor - t.goalsAgainst}</td>
+                <td style="font-weight:bold">${t.points}</td>
+            </tr>
+        `).join('');
+    }
+
+    function selectTactic(t) {
+        state.tactic = t;
+        document.querySelectorAll('.tactic-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById(`tac-${t}`).classList.add('selected');
+    }
+
+    // === ДВИЖОК МАТЧА ===
+    function startMatch() {
+        goToScreen('match');
+        document.getElementById('match-stage-title').innerText = 
+            state.currentStage === 'group' ? `Групповой этап. Тур ${state.groupRound + 1}` : STAGE_NAMES[state.currentStage];
+        document.getElementById('match-opponent-name').innerText = state.currentOpponent;
+        document.getElementById('match-score').innerText = '0 : 0';
+        document.getElementById('match-clock').innerText = '0';
+        document.getElementById('match-logs').innerHTML = '<div class="log-entry" style="text-align: center; border: none; color: #888;">Свисток арбитра! Матч начался.</div>';
+        document.getElementById('btn-match-next').style.display = 'none';
+
+        generateMatchEvents();
+        runSimulation();
+    }
+
+    function generateMatchEvents() {
+        let xGoalsBase = 1.5, oppGoalsBase = 1.5;
+        
+        if (state.tactic === 'attack') { xGoalsBase = 2.5; oppGoalsBase = 2.0; }
+        else if (state.tactic === 'defense') { xGoalsBase = 0.8; oppGoalsBase = 0.5; }
+
+        // Добавим рандома от 0.5 до 1.5
+        const rnd = () => 0.5 + Math.random();
+        
+        let xGoals = Math.round(xGoalsBase * rnd());
+        let oppGoals = Math.round(oppGoalsBase * rnd());
+        
+        // В плей-офф команды сильнее (чуть сложнее)
+        if (state.currentStage !== 'group') {
+            if (Math.random() > 0.6) oppGoals++;
+        }
+
+        const events = [];
+        
+        // Распределяем голы по минутам
+        for (let i = 0; i < xGoals; i++) {
+            events.push({ min: Math.floor(Math.random() * 88) + 2, type: 'goal_x' });
+        }
+        for (let i = 0; i < oppGoals; i++) {
+            events.push({ min: Math.floor(Math.random() * 88) + 2, type: 'goal_opp' });
+        }
+
+        // Добавляем обычные события (3-5 штук)
+        const numEvents = Math.floor(Math.random() * 3) + 3;
+        const types = ['save', 'tackle', 'mid_pass', 'opp_attack'];
+        for (let i = 0; i < numEvents; i++) {
+            events.push({ min: Math.floor(Math.random() * 88) + 2, type: getRandomItem(types) });
+        }
+
+        events.sort((a, b) => a.min - b.min);
+
+        // Убираем дубли по минутам
+        const uniqueEvents = [];
+        let lastMin = -1;
+        for (let e of events) {
+            if (e.min !== lastMin) {
+                uniqueEvents.push(e);
+                lastMin = e.min;
+            }
+        }
+
+        state.matchState = {
+            events: uniqueEvents,
+            xGoals: 0,
+            oppGoals: 0,
+            scorers: [],
+            pensWinner: null
+        };
+    }
+
+    function generateLogText(type) {
+        const gk = getRandomItem(getPlayersByGroup('gk'));
+        const def = getRandomItem(getPlayersByGroup('def'));
+        const mid = getRandomItem(getPlayersByGroup('mid'));
+        const att = getRandomItem(getPlayersByGroup('att'));
+
+        const msgs = {
+            'goal_x': [
+                `ГОЛ!!! ${mid} выдает шикарный пас, и ${att} вколачивает мяч в сетку!`,
+                `ГОЛ!!! ${att} обыгрывает защитника и бьет точно в угол!`,
+                `ГОООЛ! Пушка страшная! ${att} забивает невероятный мяч из-за пределов штрафной!`
+            ],
+            'goal_opp': [
+                `К сожалению, пропускаем. Оборона не уследила за нападающим соперника.`,
+                `Гол. Соперник разыграл отличную комбинацию, ${gk} был бессилен.`,
+                `Пропускаем обидный мяч после стандарта...`
+            ],
+            'save': [
+                `Невероятный момент! Соперник бьет в упор, но ${gk} совершает сумасшедший сейв!`,
+                `Опасный удар издали! ${gk} вытягивается в струнку и переводит мяч на угловой.`
+            ],
+            'tackle': [
+                `Опасная атака! Но ${def} в шикарном подкате выбивает мяч!`,
+                `Надежно в защите! ${def} выигрывает силовую борьбу и отводит угрозу.`
+            ],
+            'mid_pass': [
+                `${mid} гениально разрезает оборону пасом, но ${att} немного не успевает к мячу.`,
+                `Отличный перехват в центре поля! ${mid} начинает контратаку XTeam!`
+            ],
+            'opp_attack': [
+                `Тревожно у наших ворот... Защитники блокируют удар в последний момент.`,
+                `Штанга спасает XTeam после мощного удара соперника!`
+            ]
+        };
+
+        let text = getRandomItem(msgs[type]);
+        let className = 'log-entry';
+        if (type === 'goal_x') className += ' event-goal';
+        if (type === 'goal_opp') className += ' event-opp-goal';
+        if (type === 'save') className += ' event-save';
+        if (type === 'tackle') className += ' event-def';
+
+        return { text, className, att }; // возвращаем att, чтобы записать автора гола
+    }
+
+    function runSimulation() {
+        let minute = 0;
+        const clockEl = document.getElementById('match-clock');
+        const scoreEl = document.getElementById('match-score');
+        const logsEl = document.getElementById('match-logs');
+        
+        // Общее время симуляции ~6 секунд = 90 минут
+        const intervalMs = 6000 / 90; 
+
+        const timer = setInterval(() => {
+            minute++;
+            clockEl.innerText = minute;
+
+            if (state.matchState.events.length > 0 && state.matchState.events[0].min === minute) {
+                const ev = state.matchState.events.shift();
+                const logData = generateLogText(ev.type);
+                
+                if (ev.type === 'goal_x') {
+                    state.matchState.xGoals++;
+                    state.matchState.scorers.push(logData.att);
+                } else if (ev.type === 'goal_opp') {
+                    state.matchState.oppGoals++;
+                }
+
+                scoreEl.innerText = `${state.matchState.xGoals} : ${state.matchState.oppGoals}`;
+
+                const logDiv = document.createElement('div');
+                logDiv.className = logData.className;
+                logDiv.innerHTML = `<b>${minute}'</b> ${logData.text}`;
+                logsEl.appendChild(logDiv);
+                logsEl.scrollTop = logsEl.scrollHeight;
+
+                // Небольшая пауза при голе
+                if (ev.type.includes('goal')) {
+                    clearInterval(timer);
+                    setTimeout(() => runSimulationLoop(), 800); // возобновляем
+                    return; // прерываем текущий цикл
+                }
+            }
+
+            if (minute >= 90) {
+                clearInterval(timer);
+                endMatchLogic();
+            }
+        }, intervalMs);
+
+        // Функция для возобновления, чтобы не терять контекст
+        function runSimulationLoop() {
+            const timer2 = setInterval(() => {
+                minute++;
+                if(minute > 90) { clearInterval(timer2); endMatchLogic(); return; }
+                clockEl.innerText = minute;
+                
+                if (state.matchState.events.length > 0 && state.matchState.events[0].min === minute) {
+                    const ev = state.matchState.events.shift();
+                    const logData = generateLogText(ev.type);
+                    
+                    if (ev.type === 'goal_x') {
+                        state.matchState.xGoals++;
+                        state.matchState.scorers.push(logData.att);
+                    } else if (ev.type === 'goal_opp') {
+                        state.matchState.oppGoals++;
+                    }
+                    scoreEl.innerText = `${state.matchState.xGoals} : ${state.matchState.oppGoals}`;
+
+                    const logDiv = document.createElement('div');
+                    logDiv.className = logData.className;
+                    logDiv.innerHTML = `<b>${minute}'</b> ${logData.text}`;
+                    logsEl.appendChild(logDiv);
+                    logsEl.scrollTop = logsEl.scrollHeight;
+                }
+            }, intervalMs);
+        }
+    }
+
+    function endMatchLogic() {
+        const logsEl = document.getElementById('match-logs');
+        const endLog = document.createElement('div');
+        endLog.className = 'log-entry';
+        endLog.style.textAlign = 'center';
+        endLog.innerHTML = `<b>90'</b> Финальный свисток!`;
+        
+        let needPens = false;
+
+        // Логика пенальти для плей-офф
+        if (state.currentStage !== 'group' && state.matchState.xGoals === state.matchState.oppGoals) {
+            endLog.innerHTML += `<br>Ничья в основное время! Нас ждет серия пенальти!`;
+            needPens = true;
+            
+            // Симулируем пенальти
+            const xWin = Math.random() > 0.5;
+            state.matchState.pensWinner = xWin ? 'XTeam' : state.currentOpponent;
+            const scorePens = xWin ? '4:3' : '3:4';
+            
+            setTimeout(() => {
+                const penLog = document.createElement('div');
+                penLog.className = xWin ? 'log-entry event-goal' : 'log-entry event-opp-goal';
+                penLog.style.textAlign = 'center';
+                penLog.innerHTML = `<b>СЕРИЯ ПЕНАЛЬТИ:</b> ${xWin ? 'Денис Гришин тащит решающий удар!' : 'Соперник оказался точнее.'} Счет по пенальти ${scorePens}`;
+                logsEl.appendChild(penLog);
+                logsEl.scrollTop = logsEl.scrollHeight;
+                document.getElementById('btn-match-next').style.display = 'block';
+            }, 1500);
+        } else {
+            document.getElementById('btn-match-next').style.display = 'block';
+        }
+
+        logsEl.appendChild(endLog);
+        logsEl.scrollTop = logsEl.scrollHeight;
+    }
+
+    function finishMatch() {
+        document.getElementById('postmatch-score').innerText = `${state.matchState.xGoals} : ${state.matchState.oppGoals}`;
+        
+        const pensDiv = document.getElementById('postmatch-pens');
+        if (state.matchState.pensWinner) {
+            pensDiv.style.display = 'block';
+            pensDiv.innerText = `Победа по пенальти: ${state.matchState.pensWinner}`;
+        } else {
+            pensDiv.style.display = 'none';
+        }
+
+        const scorersUl = document.getElementById('postmatch-xteam-scorers');
+        if (state.matchState.scorers.length > 0) {
+            scorersUl.innerHTML = state.matchState.scorers.map(s => `<li>⚽ ${s}</li>`).join('');
+        } else {
+            scorersUl.innerHTML = '<li>Голов нет</li>';
+        }
+
+        goToScreen('postmatch');
+    }
+
+    // === ТУРНИРНАЯ ЛОГИКА ===
+    function processTournamentLogic() {
+        const xGoals = state.matchState.xGoals;
+        const oppGoals = state.matchState.oppGoals;
+        const xWon = state.matchState.pensWinner === 'XTeam' || xGoals > oppGoals;
+        const isDraw = xGoals === oppGoals && !state.matchState.pensWinner;
+        
+        if (state.currentStage === 'group') {
+            // Обновляем стату своей группы
+            const myG = state.groups[state.xteamGroup];
+            const tX = myG.find(t => t.name === "XTeam");
+            const tOpp = myG.find(t => t.name === state.currentOpponent);
+
+            tX.played++; tOpp.played++;
+            tX.goalsFor += xGoals; tX.goalsAgainst += oppGoals;
+            tOpp.goalsFor += oppGoals; tOpp.goalsAgainst += xGoals;
+
+            if (xGoals > oppGoals) { tX.points += 3; }
+            else if (oppGoals > xGoals) { tOpp.points += 3; }
+            else { tX.points += 1; tOpp.points += 1; }
+
+            // Авто-симуляция второго матча в группе
+            const others = myG.filter(t => t.name !== "XTeam" && t.name !== state.currentOpponent && t.played < state.groupRound + 1);
+            if (others.length === 2) {
+                const g1 = Math.floor(Math.random() * 3);
+                const g2 = Math.floor(Math.random() * 3);
+                others[0].played++; others[1].played++;
+                others[0].goalsFor += g1; others[0].goalsAgainst += g2;
+                others[1].goalsFor += g2; others[1].goalsAgainst += g1;
+                if (g1 > g2) others[0].points += 3;
+                else if (g2 > g1) others[1].points += 3;
+                else { others[0].points += 1; others[1].points += 1; }
+            }
+
+            state.groupRound++;
+            
+            if (state.groupRound < 3) {
+                setupNextMatch();
+            } else {
+                finishGroupStage();
+            }
+        } else {
+            // Плей-офф логика
+            if (xWon) {
+                advancePlayoff();
+            } else {
+                gameOver(`Стадия: ${STAGE_NAMES[state.currentStage]}. Поражение от ${state.currentOpponent}`);
+            }
+        }
+    }
+
+    function finishGroupStage() {
+        // Симулируем остальные 11 групп (упрощенно: назначаем рандомные очки 0-9 и разницу)
+        for (let letter in state.groups) {
+            if (letter === state.xteamGroup) continue; // Наша группа уже посчитана
+            
+            state.groups[letter].forEach(t => {
+                t.played = 3;
+                t.points = [0,1,2,3,4,5,6,7,9][Math.floor(Math.random() * 9)];
+                t.goalsFor = Math.floor(Math.random() * 6);
+                t.goalsAgainst = Math.floor(Math.random() * 6);
+            });
+        }
+
+        let advancedTeams = [];
+        let thirdPlaces = [];
+
+        for (let letter in state.groups) {
+            let grp = state.groups[letter];
+            grp.sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                return (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst);
+            });
+            advancedTeams.push(grp[0].name, grp[1].name);
+            thirdPlaces.push(grp[2]);
+        }
+
+        // Выбираем 8 лучших 3-х мест
+        thirdPlaces.sort((a, b) => {
+            if (b.points !== a.points) return b.points - a.points;
+            return (b.goalsFor - b.goalsAgainst) - (a.goalsFor - a.goalsAgainst);
+        });
+        
+        for (let i = 0; i < 8; i++) {
+            advancedTeams.push(thirdPlaces[i].name);
+        }
+
+        if (advancedTeams.includes("XTeam")) {
+            // Прошли!
+            state.playoffTeams = shuffle(advancedTeams);
+            state.currentStage = '1/16';
+            buildPlayoffBracket();
+            alert("Поздравляем! XTeam выходит в Плей-офф!");
+            setupNextMatch();
+        } else {
+            // Вылетели
+            gameOver("Вы не смогли выйти из группы...");
+        }
+    }
+
+    function buildPlayoffBracket() {
+        state.playoffBracket = [];
+        for (let i = 0; i < state.playoffTeams.length; i += 2) {
+            state.playoffBracket.push([state.playoffTeams[i], state.playoffTeams[i+1]]);
+        }
+    }
+
+    function advancePlayoff() {
+        const stages = ['1/16', '1/8', '1/4', '1/2', 'final'];
+        const nextIdx = stages.indexOf(state.currentStage) + 1;
+
+        if (nextIdx >= stages.length) {
+            showWinScreen();
+            return;
+        }
+
+        // Уменьшаем количество команд в 2 раза
+        const newTeams = [];
+        for (let pair of state.playoffBracket) {
+            if (pair.includes("XTeam")) {
+                newTeams.push("XTeam"); // Мы победили
+            } else {
+                newTeams.push(pair[Math.floor(Math.random() * 2)]); // Симуляция других матчей
+            }
+        }
+        
+        state.playoffTeams = newTeams;
+        state.currentStage = stages[nextIdx];
+        buildPlayoffBracket();
+        setupNextMatch();
+    }
+
+    function gameOver(reason) {
+        document.getElementById('gameover-text').innerText = reason;
+        goToScreen('gameover');
+    }
+
+    function showWinScreen() {
+        goToScreen('win');
+        createConfetti();
+    }
+
+    function createConfetti() {
+        const colors = ['#00ff41', '#00d2ff', '#ff003f', '#ffd700'];
+        for (let i = 0; i < 100; i++) {
+            const conf = document.createElement('div');
+            conf.className = 'confetti';
+            conf.style.left = Math.random() * 100 + 'vw';
+            conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            conf.style.animation = `confettiFall ${Math.random() * 3 + 2}s linear infinite`;
+            conf.style.animationDelay = `${Math.random() * 2}s`;
+            document.getElementById('screen-win').appendChild(conf);
+        }
+    }
+
+    // Рендер состава при загрузке
+    document.getElementById('roster-list').innerHTML = xteamRoster.map(p => `
+        <div class="player-row">
+            <span class="player-pos">${p.pos}</span>
+            <span>${p.name}</span>
+        </div>
+    `).join('');
+
+</script>
+</body>
+</html>
