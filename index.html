@@ -292,6 +292,7 @@
         </div>
         <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
             <button class="btn btn-green" onclick="goToScreen('draw'); initTournament();">Начать турнир</button>
+            <button class="btn" style="border-color: #ffd700; color: #ffd700;" onclick="goToScreen('shop')">🛒 Магазин</button>
             <button class="btn" onclick="goToScreen('roster')">Состав XTeam</button>
         </div>
     </div>
@@ -303,6 +304,19 @@
             <!-- Заполняется из JS -->
         </div>
         <button class="btn" onclick="goToScreen('menu')">Назад в меню</button>
+    </div>
+
+     <!-- ЭКРАН МАГАЗИНА -->
+    <div id="screen-shop" class="screen">
+        <h2 style="margin-top: 10px; color: #ffd700;">Магазин</h2>
+        
+        <div class="panel" style="text-align: center; border: 1px solid #ffd700; background: linear-gradient(180deg, rgba(255,215,0,0.1), rgba(0,0,0,0.5));">
+            <div style="font-size: 60px; margin: 10px 0;">🎴</div>
+            <h3 style="color: #ffd700; font-size: 20px; margin-bottom: 8px;">Скоро здесь будут паки</h3>
+            <p style="color: #aaa; font-size: 14px;">Раздел находится в разработке.</p>
+        </div>
+
+        <button class="btn" style="margin-top: auto;" onclick="goToScreen('menu')">Назад в меню</button>
     </div>
 
     <!-- ЭКРАН ЖЕРЕБЬЕВКИ -->
