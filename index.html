@@ -274,13 +274,178 @@
             margin: 20px 0;
             animation: pulseNeon 2s infinite;
         }
+            /* === ФУТБОЛЬНОЕ ПОЛЕ (FIFA STYLE) === */
+        .pitch-container {
+            width: 100%;
+            background: linear-gradient(180deg, #1e4d2b 0%, #133a1e 100%);
+            border: 2px solid #00ff41;
+            border-radius: 16px;
+            padding: 15px 10px;
+            position: relative;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.6), 0 0 15px rgba(0,255,65,0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Разметка поля */
+        .pitch-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Линии зон на поле */
+        .pitch-line {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            z-index: 2;
+        }
+
+        /* Карточка игрока НА ПОЛЕ */
+        .pitch-card {
+            background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(35,35,45,0.95));
+            border: 1px solid var(--neon-green);
+            border-radius: 8px;
+            width: 75px;
+            padding: 6px 4px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.8), 0 0 8px rgba(0,255,65,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .pitch-card:hover {
+            transform: scale(1.05);
+        }
+
+        .pitch-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            width: 100%;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 2px;
+            margin-bottom: 3px;
+        }
+
+        .pitch-ovr {
+            font-size: 13px;
+            font-weight: 900;
+            color: #ffd700;
+        }
+
+        .pitch-pos {
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--neon-blue);
+        }
+
+        .pitch-name {
+            font-size: 10px;
+            font-weight: bold;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            margin-bottom: 2px;
+        }
+
+        .pitch-main-stat {
+            font-size: 9px;
+            color: #aaa;
+        }
+        .pitch-main-stat span {
+            color: var(--neon-green);
+            font-weight: bold;
+        }
+
+/* Стили карточки бесплатного пака */
+.
+
+        /* === АНИМАЦИИ ПАКА === */
+        @keyframes packPackReveal {
+            0% {
+                transform: scale(0.1) rotate(-10deg);
+                opacity: 0;
+                filter: brightness(3);
+            }
+            60% {
+                transform: scale(1.1) rotate(3deg);
+                opacity: 1;
+                filter: brightness(1.5);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                filter: brightness(1);
+            }
+        }
+
+        @keyframes goldGlow {
+            0% { box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.9), 0 0 80px rgba(255, 215, 0, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
+        }
+
+        .pack-card-anim {
+            animation: packPackReveal 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, goldGlow 2s infinite ease-in-out;
+        }
+
+
+        /* === АНИМАЦИИ СТАРТОВОГО ЭКРАНА === */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+}
+
+
     </style>
 </head>
 <body>
-<!-- Фоновая музыка -->
-<audio id="bg-music" loop>
-    <source src="bg-music.mp3" type="audio/mpeg">
-</audio>
+    <!-- ТЕГ ДЛЯ ФОНОВОЙ МУЗЫКИ -->
+    <audio id="bg-music" src="bg-music.mp3" loop></audio>
+
+    <!-- СТАРТОВЫЙ ЭКРАН (ОКНО КЛИКА) -->
+    <div id="start-overlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(135deg, #0f0f15, #1e102a);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: opacity 0.5s ease;
+    " onclick="startGame()">
+        
+        <div style="font-size: 70px; margin-bottom: 20px; animation: pulse 1.5s infinite;">⚽</div>
+        <h1 style="color: #ffd700; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; text-shadow: 0 0 10px #ffd700;">XTeam Tournament</h1>
+        <p style="color: #fff; font-size: 16px; font-weight: bold; animation: blink 1.2s infinite;">НАЖМИ В ЛЮБОЕ МЕСТО, ЧТОБЫ НАЧАТЬ</p>
+    </div>
 
 <div id="app">
     <!-- ГЛАВНОЕ МЕНЮ -->
@@ -297,27 +462,80 @@
         </div>
     </div>
 
-    <!-- СОСТАВ -->
+    <!-- СОСТАВ НА ПОЛЕ -->
     <div id="screen-roster" class="screen">
-        <h2 style="margin-top: 10px;">Состав XTeam</h2>
-        <div class="panel" id="roster-list">
-            <!-- Заполняется из JS -->
+        <h2 style="margin-top: 5px; margin-bottom: 10px;">Стартовый Состав</h2>
+        
+        <div class="pitch-container">
+            <!-- Линия Атаки (3 нападающих) -->
+            <div class="pitch-line" id="line-att"></div>
+            
+            <!-- Линия Полузащиты (3 полузащитника) -->
+            <div class="pitch-line" id="line-mid"></div>
+            
+            <!-- Линия Защиты (4 защитника) -->
+            <div class="pitch-line" id="line-def"></div>
+            
+            <!-- Вратарь (1 воротчик) -->
+            <div class="pitch-line" id="line-gk"></div>
         </div>
-        <button class="btn" onclick="goToScreen('menu')">Назад в меню</button>
+
+        <button class="btn" style="margin-top: 10px;" onclick="goToScreen('menu')">Назад в меню</button>
     </div>
 
-     <!-- ЭКРАН МАГАЗИНА -->
+        <!-- ЭКРАН МАГАЗИНА -->
     <div id="screen-shop" class="screen">
         <h2 style="margin-top: 10px; color: #ffd700;">Магазин</h2>
         
-        <div class="panel" style="text-align: center; border: 1px solid #ffd700; background: linear-gradient(180deg, rgba(255,215,0,0.1), rgba(0,0,0,0.5));">
-            <div style="font-size: 60px; margin: 10px 0;">🎴</div>
-            <h3 style="color: #ffd700; font-size: 20px; margin-bottom: 8px;">Скоро здесь будут паки</h3>
-            <p style="color: #aaa; font-size: 14px;">Раздел находится в разработке.</p>
+        <!-- Кнопка перехода в коллекцию -->
+        <button class="btn" style="border-color: #00d2ff; color: #00d2ff; margin-bottom: 10px;" onclick="goToScreen('collection'); renderCollection();">
+            🎴 Моя коллекция
+        </button>
+
+        <!-- Витрина с таймером -->
+        <div class="panel" style="text-align: center; border: 2px solid #ffd700; background: linear-gradient(180deg, rgba(255,215,0,0.15), rgba(0,0,0,0.6));">
+            <div style="font-size: 65px; margin: 5px 0; text-shadow: 0 0 15px #ffd700;">🎴</div>
+            <h3 style="color: #ffd700; font-size: 20px; margin-bottom: 5px;">Бесплатный Пак XTeam</h3>
+            <p style="color: #ccc; font-size: 13px; margin-bottom: 15px;">Доступен раз в 5 минут!</p>
+            
+            <button id="pack-btn" class="btn btn-green" style="font-size: 16px; padding: 12px 20px; width: 100%;" onclick="openFreePack()">
+                🎁 Открыть БЕСПЛАТНО
+            </button>
+            <div id="pack-timer" style="display: none; color: #ff003f; font-weight: bold; font-size: 16px; margin-top: 10px;">
+                Следующий пак через: <span id="timer-count">05:00</span>
+            </div>
         </div>
+
+        <div id="pack-result" style="display: none; margin-bottom: 15px;"></div>
 
         <button class="btn" style="margin-top: auto;" onclick="goToScreen('menu')">Назад в меню</button>
     </div>
+
+    <!-- ЭКРАН КОЛЛЕКЦИИ -->
+    <div id="screen-collection" class="screen">
+        <h2 style="margin-top: 10px; color: #00d2ff;">Коллекция карточек</h2>
+        
+        <div id="collection-stats" style="color: #aaa; font-size: 14px; margin-bottom: 10px; text-align: center;">
+            Собрано: 0 / 0
+        </div>
+
+        <!-- Сетка с карточками -->
+        <div id="collection-grid" style="
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+            overflow-y: auto; 
+            max-height: 60vh; 
+            padding: 5px;
+        ">
+            <!-- Карточки будут генерироваться через JS -->
+        </div>
+
+        <button class="btn" style="margin-top: auto;" onclick="goToScreen('shop')">Назад в магазин</button>
+    </div>
+
+
+
 
     <!-- ЭКРАН ЖЕРЕБЬЕВКИ -->
     <div id="screen-draw" class="screen">
@@ -436,20 +654,21 @@
 </div>
 
 <script>
-    // === ДАННЫЕ ===
+        // === ДАННЫЕ ИГРОКОВ XTEAM ===
     const xteamRoster = [
-        { name: "Денис Гришин", pos: "ВРТ", group: "gk" },
-        { name: "Артем Гришин", pos: "ЦЗ", group: "def" },
-        { name: "Андрей Гришин", pos: "ЦЗ", group: "def" },
-        { name: "Кирилл Гришин", pos: "ЛЗ", group: "def" },
-        { name: "Женя Гейда", pos: "ПЗ", group: "def" },
-        { name: "Влад Байкин", pos: "ЦП", group: "mid" },
-        { name: "Яромир Дрюкарев", pos: "ЦП", group: "mid" },
-        { name: "Андрей Гриша", pos: "ЛВ", group: "att" },
-        { name: "Артем Гриша", pos: "ПВ", group: "att" },
-        { name: "Идрис Мастонов", pos: "ЦАП", group: "mid" },
-        { name: "Шахин Мастонов", pos: "НАП", group: "att" }
+        { id: 1, name: "Денис Гришин", pos: "ВРТ", ovr: 88, group: "gk", stats: { PAC: 82, SHO: 40, PAS: 78, DEF: 89, DRI: 80, PHY: 85 } },
+        { id: 2, name: "Артем Гришин", pos: "ЦЗ", ovr: 85, group: "def", stats: { PAC: 78, SHO: 52, PAS: 70, DEF: 86, DRI: 68, PHY: 87 } },
+        { id: 3, name: "Андрей Гришин", pos: "ЦЗ", ovr: 84, group: "def", stats: { PAC: 75, SHO: 48, PAS: 68, DEF: 85, DRI: 65, PHY: 86 } },
+        { id: 4, name: "Шахин Мастонов", pos: "ЛЗ", ovr: 83, group: "def", stats: { PAC: 84, SHO: 60, PAS: 74, DEF: 81, DRI: 76, PHY: 78 } },
+        { id: 5, name: "Женя Гейда", pos: "ПЗ", ovr: 82, group: "def", stats: { PAC: 83, SHO: 58, PAS: 72, DEF: 80, DRI: 74, PHY: 77 } },
+        { id: 6, name: "Влад Байкин", pos: "ЦП", ovr: 86, group: "mid", stats: { PAC: 80, SHO: 78, PAS: 87, DEF: 74, DRI: 83, PHY: 80 } },
+        { id: 7, name: "Яромир Дрюкарев", pos: "ЦП", ovr: 85, group: "mid", stats: { PAC: 79, SHO: 75, PAS: 85, DEF: 76, DRI: 82, PHY: 79 } },
+        { id: 8, name: "Андрей Гриша", pos: "ЛВ", ovr: 87, group: "att", stats: { PAC: 89, SHO: 84, PAS: 80, DEF: 45, DRI: 88, PHY: 72 } },
+        { id: 9, name: "Артем Гриша", pos: "ПВ", ovr: 87, group: "att", stats: { PAC: 90, SHO: 83, PAS: 79, DEF: 42, DRI: 87, PHY: 70 } },
+        { id: 10, name: "Идрис Мастонов", pos: "ЦАП", ovr: 89, group: "mid", stats: { PAC: 85, SHO: 86, PAS: 90, DEF: 50, DRI: 89, PHY: 75 } },
+        { id: 11, name: "Кирилл Гришин", pos: "НАП", ovr: 91, group: "att", stats: { PAC: 92, SHO: 91, PAS: 81, DEF: 40, DRI: 90, PHY: 82 } }
     ];
+
 
     const allNations = [
         "Аргентина", "Франция", "Бразилия", "Англия", "Испания", "Германия", "Португалия", "Нидерланды", 
@@ -509,7 +728,7 @@
     // === ИНИЦИАЛИЗАЦИЯ ТУРНИРА ===
         function initTournament() {
              // 3. ВСТАВЛЯЕМ СЮДА (Запуск музыки)
-            const music = document.getElementById('bg-music');
+            const music = document.getElementById('bg-muic');
             if (music) {
                  music.volume = 0.3; // Громкость 30%
                  music.play().catch(e => console.log("Ждем клика пользователя"));
@@ -1007,13 +1226,308 @@
         }
     }
 
-    // Рендер состава при загрузке
-    document.getElementById('roster-list').innerHTML = xteamRoster.map(p => `
-        <div class="player-row">
-            <span class="player-pos">${p.pos}</span>
-            <span>${p.name}</span>
-        </div>
-    `).join('');
+          // Функция создания маленькой карточки FIFA для поля
+    function createPitchCard(player) {
+        // Показываем главный параметр в зависимости от позиции
+        let keyStatLbl = 'PAC';
+        let keyStatVal = player.stats.PAC;
+        
+        if (player.group === 'gk') { keyStatLbl = 'DEF'; keyStatVal = player.stats.DEF; }
+        else if (player.group === 'def') { keyStatLbl = 'DEF'; keyStatVal = player.stats.DEF; }
+        else if (player.group === 'mid') { keyStatLbl = 'PAS'; keyStatVal = player.stats.PAS; }
+        else if (player.group === 'att') { keyStatLbl = 'SHO'; keyStatVal = player.stats.SHO; }
+
+        return `
+            <div class="pitch-card">
+                <div class="pitch-card-top">
+                    <span class="pitch-ovr">${player.ovr}</span>
+                    <span class="pitch-pos">${player.pos}</span>
+                </div>
+                <div class="pitch-name">${player.name.split(' ')[0]}</div>
+                <div class="pitch-main-stat">${keyStatLbl}: <span>${keyStatVal}</span></div>
+            </div>
+        `;
+    }
+
+    // Расстановка команды на поле по линиям
+    function renderPitchRoster() {
+        const attLine = document.getElementById('line-att');
+        const midLine = document.getElementById('line-mid');
+        const defLine = document.getElementById('line-def');
+        const gkLine = document.getElementById('line-gk');
+
+        if (!attLine) return;
+
+        attLine.innerHTML = xteamRoster.filter(p => p.group === 'att').map(createPitchCard).join('');
+        midLine.innerHTML = xteamRoster.filter(p => p.group === 'mid').map(createPitchCard).join('');
+        defLine.innerHTML = xteamRoster.filter(p => p.group === 'def').map(createPitchCard).join('');
+        gkLine.innerHTML = xteamRoster.filter(p => p.group === 'gk').map(createPitchCard).join('');
+    }
+
+    // Запуск рендера
+    renderPitchRoster();
+
+                // === ЛОГИКА КОЛЛЕКЦИИ И ПАКА ===
+    
+    // 1. Получение коллекции из памяти
+    function getSavedCollection() {
+        const saved = localStorage.getItem('xteam_user_collection');
+        return saved ? JSON.parse(saved) : {};
+    }
+
+    // 2. Добавление выбитого игрока в коллекцию
+    function addPlayerToCollection(player, ovr) {
+        const collection = getSavedCollection();
+        
+        if (collection[player.name]) {
+            collection[player.name].count += 1;
+            if (ovr > collection[player.name].ovr) {
+                collection[player.name].ovr = ovr;
+            }
+        } else {
+            collection[player.name] = {
+                name: player.name,
+                pos: player.pos,
+                ovr: ovr,
+                count: 1
+            };
+        }
+
+        localStorage.setItem('xteam_user_collection', JSON.stringify(collection));
+    }
+
+    // 3. Отрисовка экрана коллекции
+    function renderCollection() {
+        const grid = document.getElementById('collection-grid');
+        const stats = document.getElementById('collection-stats');
+        if (!grid || !stats) return;
+
+        const collection = getSavedCollection();
+        const collectedNames = Object.keys(collection);
+
+        stats.innerText = `Собрано игроков: ${collectedNames.length} из ${xteamRoster.length}`;
+        grid.innerHTML = '';
+
+        xteamRoster.forEach(player => {
+            const item = collection[player.name];
+            const isUnlocked = !!item;
+
+            if (isUnlocked) {
+                grid.innerHTML += `
+                    <div style="
+                        background: linear-gradient(180deg, #ffe566, #b8860b);
+                        border: 2px solid #fff;
+                        border-radius: 12px;
+                        padding: 10px 5px;
+                        text-align: center;
+                        color: #000;
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+                        position: relative;
+                    ">
+                        <div style="position: absolute; top: 4px; right: 6px; background: rgba(0,0,0,0.7); color: #ffd700; font-size: 10px; padding: 2px 5px; border-radius: 8px;">
+                            x${item.count}
+                        </div>
+                        <div style="font-size: 20px; font-weight: 900; line-height: 1;">${item.ovr}</div>
+                        <div style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">${item.pos}</div>
+                        <div style="font-size: 25px; margin: 2px 0;">⚽</div>
+                        <div style="font-size: 11px; font-weight: 900; text-transform: uppercase; word-wrap: break-word;">${item.name}</div>
+                    </div>
+                `;
+            } else {
+                grid.innerHTML += `
+                    <div style="
+                        background: rgba(255,255,255,0.05);
+                        border: 2px dashed #444;
+                        border-radius: 12px;
+                        padding: 10px 5px;
+                        text-align: center;
+                        color: #555;
+                    ">
+                        <div style="font-size: 20px; font-weight: 900; line-height: 1;">?</div>
+                        <div style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">${player.pos}</div>
+                        <div style="font-size: 25px; margin: 2px 0; filter: grayscale(1); opacity: 0.3;">⚽</div>
+                        <div style="font-size: 11px; font-weight: bold; text-transform: uppercase;">???</div>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    // 4. Логика таймера (5 минут)
+    const COOLDOWN_TIME = 5 * 60 * 1000;
+    let timerInterval = null;
+
+    function checkPackCooldown() {
+        const lastOpen = localStorage.getItem('xteam_last_pack_open');
+        const btn = document.getElementById('pack-btn');
+        const timerDiv = document.getElementById('pack-timer');
+
+        if (!btn || !timerDiv) return;
+
+        if (!lastOpen) {
+            btn.style.display = 'block';
+            timerDiv.style.display = 'none';
+            return;
+        }
+
+        const now = Date.now();
+        const timePassed = now - parseInt(lastOpen, 10);
+        const timeLeft = COOLDOWN_TIME - timePassed;
+
+        if (timeLeft > 0) {
+            btn.style.display = 'none';
+            timerDiv.style.display = 'block';
+            
+            updateTimerDisplay(timeLeft);
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                const currentNow = Date.now();
+                const currentLeft = COOLDOWN_TIME - (currentNow - parseInt(lastOpen, 10));
+
+                if (currentLeft <= 0) {
+                    clearInterval(timerInterval);
+                    btn.style.display = 'block';
+                    timerDiv.style.display = 'none';
+                } else {
+                    updateTimerDisplay(currentLeft);
+                }
+            }, 1000);
+        } else {
+            btn.style.display = 'block';
+            timerDiv.style.display = 'none';
+        }
+    }
+
+    function updateTimerDisplay(ms) {
+        const timerCount = document.getElementById('timer-count');
+        if (!timerCount) return;
+
+        const totalSeconds = Math.ceil(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        const formatted = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        timerCount.innerText = formatted;
+    }
+
+    // 5. Функция открытия пака с анимацией и сохранением
+    function openFreePack() {
+        localStorage.setItem('xteam_last_pack_open', Date.now().toString());
+        checkPackCooldown();
+
+        const randomPlayer = getRandomItem(xteamRoster);
+        const randomOvr = Math.floor(Math.random() * 13) + 80;
+
+        // Сохранение игрока в коллекцию
+        addPlayerToCollection(randomPlayer, randomOvr);
+
+        const resDiv = document.getElementById('pack-result');
+        if (!resDiv) return;
+        
+        resDiv.style.display = 'block';
+
+        resDiv.innerHTML = `
+            <div id="card-container" class="panel pack-card-anim" style="
+                text-align: center; 
+                border: 2px solid #ffd700; 
+                background: linear-gradient(135deg, #0f0f15, #2a1b00, #5c4300); 
+                padding: 20px 15px;
+                position: relative;
+                overflow: hidden;
+            ">
+                <div style="font-size: 13px; color: #ffd700; letter-spacing: 3px; font-weight: 900; margin-bottom: 12px; text-shadow: 0 0 10px #ffd700;">
+                    🔥 ИГРОК ПОЛУЧЕН! 🔥
+                </div>
+                
+                <div style="
+                    display: inline-block; 
+                    width: 150px; 
+                    background: linear-gradient(180deg, #ffe566, #b8860b, #5c4300); 
+                    color: #000; 
+                    border-radius: 16px; 
+                    padding: 15px 10px; 
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+                    border: 2px solid #fff;
+                    position: relative;
+                ">
+                    <div style="font-size: 32px; font-weight: 900; line-height: 1; text-shadow: 0 2px 4px rgba(255,255,255,0.5);">${randomOvr}</div>
+                    <div style="font-size: 14px; font-weight: 800; margin-bottom: 5px; color: #111;">${randomPlayer.pos}</div>
+                    <div style="font-size: 45px; margin: 8px 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));">⚽</div>
+                    <div style="font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;">${randomPlayer.name}</div>
+                </div>
+                <div style="margin-top: 10px; color: #00d2ff; font-size: 12px; font-weight: bold;">
+                    ✓ Добавлено в коллекцию
+                </div>
+            </div>
+        `;
+
+        spawnPackConfetti();
+        resDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 6. Салют / конфетти
+    function spawnPackConfetti() {
+        const container = document.getElementById('card-container');
+        if (!container) return;
+
+        const colors = ['#ffd700', '#ffffff', '#00ff41', '#00d2ff'];
+        
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = Math.random() * 8 + 4 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.left = '50%';
+            particle.style.top = '50%';
+            particle.style.borderRadius = '50%';
+            particle.style.pointerEvents = 'none';
+            particle.style.zIndex = '10';
+
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 120 + 40;
+            const x = Math.cos(angle) * velocity;
+            const y = Math.sin(angle) * velocity;
+
+            particle.animate([
+                { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                { transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(0)`, opacity: 0 }
+            ], {
+                duration: Math.random() * 600 + 600,
+                easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+            });
+
+            container.appendChild(particle);
+        }
+    }
+
+    // 7. Автоматическая проверка таймера при старте
+    document.addEventListener('DOMContentLoaded', () => {
+        checkPackCooldown();
+    });
+
+    // === ЗАПУСК ИГРЫ И МУЗЫКИ ===
+    function startGame() {
+        const music = document.getElementById('bg-music');
+        const overlay = document.getElementById('start-overlay');
+
+        if (music) {
+            music.volume = 0.3; // Громкость 30%
+            music.play().catch(err => console.log("Ошибка воспроизведения аудио:", err));
+        }
+
+        if (overlay) {
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 500);
+        }
+    }
+
+
+
+
+
 
 </script>
 </body>
