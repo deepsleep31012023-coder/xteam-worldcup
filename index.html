@@ -459,6 +459,9 @@
             <button class="btn btn-green" onclick="goToScreen('draw'); initTournament();">Начать турнир</button>
             <button class="btn" style="border-color: #ffd700; color: #ffd700;" onclick="goToScreen('shop')">🛒 Магазин</button>
             <button class="btn" onclick="goToScreen('roster')">Состав XTeam</button>
+               <!-- КНОПКА ПРОФИЛЯ -->
+            <button class="btn" style="border-color: #00d2ff; color: #00d2ff;" onclick="goToScreen('profile')">👤 Профиль</button>
+
         </div>
     </div>
 
@@ -532,6 +535,60 @@
         </div>
 
         <button class="btn" style="margin-top: auto;" onclick="goToScreen('shop')">Назад в магазин</button>
+    </div>
+
+         
+    <!-- ЭКРАН ПРОФИЛЬ -->
+    <div id="screen-profile" class="screen">
+        <h2 style="margin-top: 10px; color: #00d2ff;">Профиль и Друзья</h2>
+
+        <div class="panel" style="border-color: #00d2ff; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 12px; max-height: 70vh; overflow-y: auto;">
+            <!-- ВВОД НИКА -->
+            <div>
+                <label style="font-size: 12px; color: #aaa; display: block; margin-bottom: 4px; text-align: left;">Твой ник:</label>
+                <input type="text" id="profile-nickname" placeholder="Введи ник..." oninput="saveProfileData()" style="
+                    width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #00d2ff; background: #0f0f15; color: #fff; font-size: 15px; box-sizing: border-box; outline: none;
+                ">
+            </div>
+
+            <!-- ВЫБОР ЛЮБИМОГО ИГРОКА -->
+            <div>
+                <label style="font-size: 12px; color: #aaa; display: block; margin-bottom: 4px; text-align: left;">Любимый игрок XTeam:</label>
+                <select id="profile-favorite-player" onchange="saveProfileData()" style="
+                    width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #00d2ff; background: #0f0f15; color: #fff; font-size: 15px; box-sizing: border-box; outline: none;
+                ">
+                </select>
+            </div>
+
+            <button class="btn btn-green" style="font-size: 13px; padding: 8px;" onclick="copyMyFriendCode()">
+                📋 Скопировать код профиля
+            </button>
+
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 2px 0;">
+
+            <!-- ДОБАВЛЕНИЕ ДРУГА -->
+            <div>
+                <label style="font-size: 12px; color: #00d2ff; font-weight: bold; display: block; margin-bottom: 4px; text-align: left;">Добавить друга по коду:</label>
+                <div style="display: flex; gap: 6px;">
+                    <input type="text" id="friend-code-input" placeholder="Вставь код друга..." style="
+                        flex-grow: 1; padding: 8px; border-radius: 8px; border: 1px solid #444; background: #0f0f15; color: #fff; font-size: 13px; box-sizing: border-box; outline: none;
+                    ">
+                    <button class="btn" style="width: auto; padding: 8px 12px; font-size: 13px; border-color: #00d2ff; color: #00d2ff;" onclick="addFriendByCode()">
+                        +
+                    </button>
+                </div>
+            </div>
+
+            <!-- СПИСОК ДРУЗЕЙ -->
+            <div>
+                <div style="font-size: 13px; color: #aaa; font-weight: bold; text-align: left; margin-bottom: 6px;">Список друзей:</div>
+                <div id="friends-list" style="display: flex; flex-direction: column; gap: 8px;">
+                    <!-- Карточки друзей -->
+                </div>
+            </div>
+        </div>
+
+        <button class="btn" style="margin-top: auto;" onclick="saveProfileData(); goToScreen('menu');">Назад в меню</button>
     </div>
 
 
@@ -1504,6 +1561,7 @@
     // 7. Автоматическая проверка таймера при старте
     document.addEventListener('DOMContentLoaded', () => {
         checkPackCooldown();
+        renderProfile(); // <-- Добавили эту строчку
     });
 
     // === ЗАПУСК ИГРЫ И МУЗЫКИ ===
@@ -1525,6 +1583,159 @@
     }
 
 
+
+    // === ЛОГИКА ПРОФИЛЯ И ДРУЗЕЙ (БЕЗ СТАТИСТИКИ) ===
+
+    function getProfileData() {
+        const saved = localStorage.getItem('xteam_profile');
+        return saved ? JSON.parse(saved) : {
+            nickname: '',
+            favoritePlayer: ''
+        };
+    }
+
+    function saveProfileData() {
+        const nickInput = document.getElementById('profile-nickname');
+        const favSelect = document.getElementById('profile-favorite-player');
+        
+        const data = {
+            nickname: nickInput ? nickInput.value : '',
+            favoritePlayer: favSelect ? favSelect.value : ''
+        };
+        
+        localStorage.setItem('xteam_profile', JSON.stringify(data));
+    }
+
+    function renderProfile() {
+        const data = getProfileData();
+
+        // Заполняем ник
+        const nickInput = document.getElementById('profile-nickname');
+        if (nickInput) nickInput.value = data.nickname || '';
+
+        // Заполняем выбор любимого игрока
+        const select = document.getElementById('profile-favorite-player');
+        if (select) {
+            select.innerHTML = '<option value="">Выбери игрока...</option>';
+            xteamRoster.forEach(player => {
+                const opt = document.createElement('option');
+                opt.value = player.name;
+                opt.textContent = `${player.name} (${player.pos})`;
+                select.appendChild(opt);
+            });
+            select.value = data.favoritePlayer || '';
+        }
+
+        renderFriendsList();
+    }
+
+    function getFriendsList() {
+        const saved = localStorage.getItem('xteam_friends');
+        return saved ? JSON.parse(saved) : [];
+    }
+
+    function copyMyFriendCode() {
+        saveProfileData();
+        const data = getProfileData();
+        
+        if (!data.nickname.trim()) {
+            alert('Сначала введи свой ник!');
+            return;
+        }
+
+        const payload = {
+            n: data.nickname,
+            p: data.favoritePlayer || 'Не выбран'
+        };
+
+        const code = btoa(encodeURIComponent(JSON.stringify(payload)));
+        
+        navigator.clipboard.writeText(code).then(() => {
+            alert('Код профиля скопирован! Отправь его другу.');
+        }).catch(() => {
+            prompt('Твой код профиля (скопируй вручную):', code);
+        });
+    }
+
+    function addFriendByCode() {
+        const input = document.getElementById('friend-code-input');
+        if (!input || !input.value.trim()) return;
+
+        try {
+            const decoded = JSON.parse(decodeURIComponent(atob(input.value.trim())));
+            
+            if (!decoded.n) throw new Error('Invalid format');
+
+            const friends = getFriendsList();
+            const myData = getProfileData();
+
+            if (decoded.n === myData.nickname) {
+                alert('Нельзя добавить самого себя!');
+                return;
+            }
+
+            const existingIndex = friends.findIndex(f => f.n === decoded.n);
+            if (existingIndex !== -1) {
+                friends[existingIndex] = decoded;
+                alert(`Данные друга ${decoded.n} обновлены!`);
+            } else {
+                friends.push(decoded);
+                alert(`Друг ${decoded.n} успешно добавлен!`);
+            }
+
+            localStorage.setItem('xteam_friends', JSON.stringify(friends));
+            input.value = '';
+            renderFriendsList();
+
+        } catch (e) {
+            alert('Неверный код друга!');
+        }
+    }
+
+    function removeFriend(friendName) {
+        let friends = getFriendsList();
+        friends = friends.filter(f => f.n !== friendName);
+        localStorage.setItem('xteam_friends', JSON.stringify(friends));
+        renderFriendsList();
+    }
+
+    function renderFriendsList() {
+        const container = document.getElementById('friends-list');
+        if (!container) return;
+
+        const friends = getFriendsList();
+        container.innerHTML = '';
+
+        if (friends.length === 0) {
+            container.innerHTML = `<div style="color: #666; font-size: 12px; font-style: italic;">У тебя пока нет друзей</div>`;
+            return;
+        }
+
+        friends.forEach(f => {
+            container.innerHTML += `
+                <div style="
+                    background: rgba(255,255,255,0.05);
+                    border: 1px solid rgba(0,210,255,0.3);
+                    border-radius: 8px;
+                    padding: 8px 10px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                ">
+                    <div style="text-align: left;">
+                        <div style="font-weight: 900; color: #00d2ff; font-size: 14px;">${f.n}</div>
+                        <div style="font-size: 11px; color: #aaa;">Любимчик: <span style="color: #fff;">${f.p}</span></div>
+                    </div>
+                    <button onclick="removeFriend('${f.n}')" style="
+                        background: none; border: none; color: #ff003f; font-size: 16px; cursor: pointer; padding: 5px;
+                    ">❌</button>
+                </div>
+            `;
+        });
+    }
+
+
+    
 
 
 
